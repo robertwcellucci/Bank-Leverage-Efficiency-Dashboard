@@ -3,6 +3,8 @@
 A one-sheet Excel dashboard that screens U.S. bank holding companies for leverage and
 profitability risk, built from SEC EDGAR XBRL data for a set of 2025 10-K bank filers.
 
+![Dashboard](Dashboard_image.png)
+
 ## Project Overview
 
 This project takes raw SEC filing data for ~260 bank holding companies (SIC codes 6021 —
