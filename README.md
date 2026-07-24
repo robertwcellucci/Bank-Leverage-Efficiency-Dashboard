@@ -25,6 +25,17 @@ that is highly levered *and* has thin returns is the profile a credit analyst or
 would flag first. The dashboard highlights that intersection directly (see the "Number of
 Banks over 10x Leveraged" KPI) rather than just ranking banks by size or profitability alone.
 
+## Key Finding
+
+Applying the dashboard's screen to the 260-bank sample: small banks carry meaningfully
+more leverage than large banks while earning less on their assets (10.64x leverage / 0.90%
+median ROA for the smallest asset quartile, versus 9.14x / 1.07% for the largest), and
+leverage and ROA are negatively correlated across the full sample (r = -0.30). Leverage
+is not buying returns in this dataset. 64 of 242 banks with computable ratios (26%) sit
+above 10x leverage and below median ROA, the quadrant a credit analyst would flag first.
+Full writeup, including limitations and a bank-flagging table, in
+[`FINDINGS_MEMO.md`](FINDINGS_MEMO.md).
+
 ## Workbook Structure
 
 | Sheet | Purpose |
@@ -56,7 +67,10 @@ Banks over 10x Leveraged" KPI) rather than just ranking banks by size or profita
   matching on accession number (`adsh`) against the `companies` table
 - **GETPIVOTDATA** — pulls Assets, Liabilities, EPS, Net Income, and Stockholders' Equity
   out of the `financials_wide` pivot for each bank by accession number (`adsh`), with a
-  fallback between two interest-income XBRL tags via nested `IFERROR`
+  fallback between two interest-income XBRL tags via nested `IFERROR`. Each lookup is
+  preceded by a `COUNTIFS` existence check against the raw `financials` data, since
+  `GETPIVOTDATA` returns `0` (not an error) for a blank pivot cell — a distinction that
+  matters when a missing XBRL tag would otherwise be averaged in as a real zero
 - **INDEX/MATCH** — ranks banks by net income for the "Bank by Net Income Loss" chart
 - **SUMIF / AVERAGEIF** — rolls up totals and averages by SIC code (state vs. national
   charter) on the `State_v_National` sheet
@@ -97,6 +111,15 @@ dump down to what the workbook needs before it ever reaches Excel:
   expected with XBRL data and is handled with `IFERROR`/blank rather than hidden.
 - A few Leverage Ratio cells are blank where Stockholders' Equity reported as zero — division
   by zero is caught by `IFERROR` rather than showing `#DIV/0!`.
+- **Null-vs-zero fix:** `GETPIVOTDATA` returns a literal `0` for a blank pivot cell rather
+  than an error, so a filer with no reported value for a given tag was originally read as
+  a true zero instead of "not reported." This silently pulled Avg ROA down, since nine
+  banks (including Truist and PNC) had no `NetIncomeLoss` fact for the period. Assets,
+  Liabilities, Interest, NetIncomeLoss, and StockholdersEquity lookups in
+  `dashboard_data_raw` now run a `COUNTIFS` existence check against the raw `financials`
+  sheet before trusting the pivot value, so a genuinely missing tag returns blank (and is
+  excluded from every average) instead of a phantom zero. See `FINDINGS_MEMO.md`,
+  Limitations, for the quantified impact.
 - The "Bank / Net Income Loss / Rank" columns on `dashboard_data_raw` are a self-contained
   top-N ranking (by net income) used to feed the second chart — not part of the per-row bank
   record in columns A–O.
