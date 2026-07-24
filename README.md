@@ -67,11 +67,26 @@ Banks over 10x Leveraged" KPI) rather than just ranking banks by size or profita
 - **Data validation** — dropdown list (Small/Mid/Large) driving the size-tier filter panel
 - **Conditional formatting**, **Excel Tables**, and **charts** on the Dashboard sheet
 
-## Data Source
+## Data Source & Pipeline
 
-SEC EDGAR XBRL financial statement data (`companies.csv` / `financials.csv` equivalents,
-loaded here as the `companies` and `financials` sheets) for 10-K filers under SIC 6021 and
-6022, fiscal year end 2025-12-31.
+Source data is the SEC EDGAR Financial Statement Data Sets (`sub.txt` / `num.txt`) for the
+relevant quarter. A Python prefilter script (`edgar_prefilter.py`) narrows the full EDGAR
+dump down to what the workbook needs before it ever reaches Excel:
+
+1. **Filter submissions** — keep only 10-K filings under SIC 6021 (National Commercial
+   Banks) and 6022 (State Commercial Banks).
+2. **Filter numeric facts** — keep only the tags the dashboard uses (`Assets`,
+   `Liabilities`, `StockholdersEquity` as point-in-time stock values with `qtrs == 0`;
+   `NetIncomeLoss`, `EarningsPerShareBasic`, `InterestAndDividendIncomeOperating`/
+   `InterestIncomeOperating` as full-year flow values with `qtrs == 4`), dropping any row
+   tagged with a coregistrant or segment breakdown so each company has one clean value per
+   tag.
+3. **Align to fiscal period** — merges each numeric fact back to its filing's period and
+   keeps only facts whose `ddate` matches that period, so prior-year comparatives pulled in
+   by EDGAR don't leak into the current-year figures.
+4. **Export** — writes `companies.csv` (filing metadata) and `financials.csv` (the filtered,
+   long-format numeric facts), which become the `companies` and `financials` sheets in the
+   workbook.
 
 ## Known Data Notes
 
