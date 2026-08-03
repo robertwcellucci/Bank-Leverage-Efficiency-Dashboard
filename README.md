@@ -5,6 +5,9 @@ profitability risk, built from SEC EDGAR XBRL data for a set of 2025 10-K bank f
 
 ![Dashboard](Dashboard_image.png)
 
+I also added a companion Power BI report (`Dashboard2.pbix`) that rebuilds a similar screen on a
+relational model.
+
 ## Project Overview
 
 This project takes raw SEC filing data for ~260 bank holding companies (SIC codes 6021,
@@ -76,6 +79,51 @@ Banks over 10x Leveraged" KPI) rather than just ranking banks by size or profita
 - **Data validation** - dropdown list (Small/Mid/Large) driving the size-tier filter panel
 - **Conditional formatting**, **Excel Tables**, and **charts** on the Dashboard sheet
 
+## Power BI Companion Report (`Dashboard2.pbix`)
+
+A secondary build of a similar screen in Power BI Desktop, on the same underlying data. The
+point of including both is to show the same analysis expressed two ways: formula-driven and
+self-contained in Excel, versus a relational model with visual-level filtering and DAX in
+Power BI.
+
+### Report Structure
+
+Single page, four visuals:
+
+| Visual | What it shows |
+|---|---|
+| **Title banner** | Image header ("Bank Leverage & Efficiency Dashboard") |
+| **Charter-type matrix** | Rows by SIC code (6021 national vs. 6022 state), with average Assets, average Liabilities, and average Basic EPS per charter type — the Power BI equivalent of the `State_v_National` sheet |
+| **KPI matrix** | Average Leverage Ratio, average ROA, and total Assets across the sample |
+| **Net income bar chart** | Top 15 banks by net income, sorted descending |
+
+### Data Model
+
+Three tables loaded from the workbook — `companies` (filing metadata), `financials`
+(long-format XBRL facts), and `dashboard_data_raw` (the per-bank table with Leverage Ratio,
+ROA, and Size Tier already computed). `companies` and `financials` are related on the
+accession number (`adsh`), so company name and SIC can slice the financial facts directly
+instead of being pulled across with lookup formulas.
+
+### Power BI Skills Demonstrated
+
+- **Data model relationships** — company metadata joined to XBRL facts on `adsh`, so
+  `companies.name` and `companies.sic` can group `financials` measures without any lookup
+  step
+- **Matrix visuals** with multiple aggregations (Average and Sum) side by side
+- **DAX visual calculations** — `IF(ISATLEVEL([sic]), [<measure>], BLANK())` on the charter-type
+  matrix, which suppresses the meaningless grand-total row on averaged columns while leaving
+  the per-SIC rows intact
+- **Visual-level filters** — a Top N filter (top 15 by sum of net income) on the bar chart,
+  and a categorical filter restricting the matrix to SIC 6021/6022
+- **Sorting by measure** — the bar chart orders categories by aggregated net income rather
+  than alphabetically
+
+### How to Open
+
+Open `Dashboard2.pbix` in Power BI Desktop (free). The data is imported, so the report
+renders without a connection back to the source workbook.
+
 ## Data Source
 
 SEC EDGAR XBRL financial statement data (`companies.csv` / `financials.csv` equivalents,
@@ -101,3 +149,5 @@ loaded here as the `companies` and `financials` sheets) for 10-K filers under SI
 3. Review the charts for the leverage/ROA relationship and top/bottom performers by net
    income.
 4. Drill into `dashboard_data_raw` for the full per-bank detail behind the dashboard.
+5. 5. For the Power BI version, open `Dashboard2.pbix` in Power BI Desktop — similar screen, built
+   on a relational model instead of formulas.
