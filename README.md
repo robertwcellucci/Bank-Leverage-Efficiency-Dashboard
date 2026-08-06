@@ -84,20 +84,6 @@ ROA, and Size Tier already computed). `companies` and `financials` are related o
 accession number (`adsh`), so company name and SIC can slice the financial facts directly
 instead of being pulled across with lookup formulas.
 
-### Power BI Skills Demonstrated
-
-- **Data model relationships** — company metadata joined to XBRL facts on `adsh`, so
-  `companies.name` and `companies.sic` can group `financials` measures without any lookup
-  step
-- **Matrix visuals** with multiple aggregations (Average and Sum) side by side
-- **DAX visual calculations** — `IF(ISATLEVEL([sic]), [<measure>], BLANK())` on the charter-type
-  matrix, which suppresses the meaningless grand-total row on averaged columns while leaving
-  the per-SIC rows intact
-- **Visual-level filters** — a Top N filter (top 15 by sum of net income) on the bar chart,
-  and a categorical filter restricting the matrix to SIC 6021/6022
-- **Sorting by measure** — the bar chart orders categories by aggregated net income rather
-  than alphabetically
-
 ## Data Source
 
 SEC EDGAR XBRL financial statement data (`companies.csv` / `financials.csv` equivalents,
