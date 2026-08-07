@@ -7,7 +7,7 @@ profitability risk, built from SEC EDGAR XBRL data for a set of 2025 10-K bank f
 
 ## Project Overview
 
-This project takes raw SEC filing data for ~260 bank holding companies (SIC codes 6021,
+This project takes raw SEC filing data for 242 bank holding companies (SIC codes 6021,
 National Commercial Banks, and 6022, State Commercial Banks) and turns it into a compact,
 interactive credit-risk screen: which banks are running the highest leverage, how that
 relates to profitability (ROA), and how leverage and returns differ across bank size tiers
