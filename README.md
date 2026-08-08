@@ -16,14 +16,6 @@ It was built as a short portfolio piece to demonstrate practical Excel skills, t
 commonly screened for in entry-level data analyst postings, using a real, messy financial
 dataset rather than a toy example.
 
-## Business Framing: Why Leverage vs. Efficiency?
-
-Rather than a generic "bank scorecard," the dashboard takes a credit-risk lens: **leverage
-ratio (Assets / Stockholders' Equity)** paired against **ROA (Net Income / Assets)**. A bank
-that is highly levered *and* has thin returns is the profile a credit analyst or regulator
-would flag first. The dashboard highlights that intersection directly (see the "Number of
-Banks over 10x Leveraged" KPI) rather than just ranking banks by size or profitability alone.
-
 ## Workbook Structure
 
 | Sheet | Purpose |
